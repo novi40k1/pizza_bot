@@ -37,10 +37,7 @@ def test_pizza_size_handler():
 
     def update_user_order_json(telegram_id: int, order_data: dict) -> None:
         assert telegram_id == 12345
-        assert order_data == {
-            "pizza_name": "Margherita",
-            "pizza_size": "Medium (30cm)"
-        }
+        assert order_data == {"pizza_name": "Margherita", "pizza_size": "Medium (30cm)"}
         nonlocal update_user_order_json_called
         update_user_order_json_called = True
 
@@ -77,20 +74,24 @@ def test_pizza_size_handler():
             "id": 1,
             "telegram_id": 12345,
             "state": "WAIT_FOR_PIZZA_SIZE",
-            "order_json": '{"pizza_name": "Margherita"}'
+            "order_json": '{"pizza_name": "Margherita"}',
         }
 
-    mock_storage = Mock({
-        "update_user_order_json": update_user_order_json,
-        "update_user_state": update_user_state,
-        "get_user": get_user,
-    })
+    mock_storage = Mock(
+        {
+            "update_user_order_json": update_user_order_json,
+            "update_user_state": update_user_state,
+            "get_user": get_user,
+        }
+    )
 
-    mock_messenger = Mock({
-        "answerCallbackQuery": answerCallbackQuery,
-        "deleteMessage": deleteMessage,
-        "sendMessage": sendMessage,
-    })
+    mock_messenger = Mock(
+        {
+            "answerCallbackQuery": answerCallbackQuery,
+            "deleteMessage": deleteMessage,
+            "sendMessage": sendMessage,
+        }
+    )
 
     dispatcher = Dispatcher(mock_storage, mock_messenger)
     dispatcher.add_handlers(PizzaSizeHandler())
@@ -121,12 +122,14 @@ def test_pizza_size_handler_wrong_state():
             "id": 1,
             "telegram_id": 12345,
             "state": "WRONG_STATE",  # Wrong state for this handler
-            "order_json": "{}"
+            "order_json": "{}",
         }
 
-    mock_storage = Mock({
-        "get_user": get_user,
-    })
+    mock_storage = Mock(
+        {
+            "get_user": get_user,
+        }
+    )
     mock_messenger = Mock({})
 
     handler = PizzaSizeHandler()
@@ -135,7 +138,7 @@ def test_pizza_size_handler_wrong_state():
         "WRONG_STATE",
         {"pizza_name": "Margherita"},
         mock_storage,
-        mock_messenger
+        mock_messenger,
     )
 
     assert not can_handle
@@ -158,12 +161,14 @@ def test_pizza_size_handler_wrong_callback_data():
             "id": 1,
             "telegram_id": 12345,
             "state": "WAIT_FOR_PIZZA_SIZE",
-            "order_json": "{}"
+            "order_json": "{}",
         }
 
-    mock_storage = Mock({
-        "get_user": get_user,
-    })
+    mock_storage = Mock(
+        {
+            "get_user": get_user,
+        }
+    )
     mock_messenger = Mock({})
 
     handler = PizzaSizeHandler()
@@ -172,7 +177,7 @@ def test_pizza_size_handler_wrong_callback_data():
         "WAIT_FOR_PIZZA_SIZE",
         {"pizza_name": "Margherita"},
         mock_storage,
-        mock_messenger
+        mock_messenger,
     )
 
     assert not can_handle

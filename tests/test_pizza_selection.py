@@ -74,20 +74,24 @@ def test_pizza_selection_handler():
             "id": 1,
             "telegram_id": 12345,
             "state": "WAIT_FOR_PIZZA_NAME",
-            "order_json": "{}"
+            "order_json": "{}",
         }
 
-    mock_storage = Mock({
-        "update_user_order_json": update_user_order_json,
-        "update_user_state": update_user_state,
-        "get_user": get_user,
-    })
+    mock_storage = Mock(
+        {
+            "update_user_order_json": update_user_order_json,
+            "update_user_state": update_user_state,
+            "get_user": get_user,
+        }
+    )
 
-    mock_messenger = Mock({
-        "answerCallbackQuery": answerCallbackQuery,
-        "deleteMessage": deleteMessage,
-        "sendMessage": sendMessage,
-    })
+    mock_messenger = Mock(
+        {
+            "answerCallbackQuery": answerCallbackQuery,
+            "deleteMessage": deleteMessage,
+            "sendMessage": sendMessage,
+        }
+    )
 
     dispatcher = Dispatcher(mock_storage, mock_messenger)
     dispatcher.add_handlers(PizzaSelectionHandler())
@@ -118,21 +122,19 @@ def test_pizza_selection_handler_wrong_state():
             "id": 1,
             "telegram_id": 12345,
             "state": "WRONG_STATE",  # Wrong state for this handler
-            "order_json": "{}"
+            "order_json": "{}",
         }
 
-    mock_storage = Mock({
-        "get_user": get_user,
-    })
+    mock_storage = Mock(
+        {
+            "get_user": get_user,
+        }
+    )
     mock_messenger = Mock({})
 
     handler = PizzaSelectionHandler()
     can_handle = handler.can_handle(
-        test_update,
-        "WRONG_STATE",
-        {},
-        mock_storage,
-        mock_messenger
+        test_update, "WRONG_STATE", {}, mock_storage, mock_messenger
     )
 
     assert not can_handle
