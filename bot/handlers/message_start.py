@@ -6,14 +6,28 @@ from bot.handlers.handler import Handler, HandlerStatus
 
 
 class MessageStart(Handler):
-    def can_handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> bool:
+    def can_handle(
+        self,
+        update: dict,
+        state: str,
+        data: dict,
+        storage: Storage,
+        messenger: Messenger,
+    ) -> bool:
         return (
             "message" in update
             and "text" in update["message"]
             and update["message"]["text"] == "/start"
         )
 
-    def handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> HandlerStatus:
+    def handle(
+        self,
+        update: dict,
+        state: str,
+        data: dict,
+        storage: Storage,
+        messenger: Messenger,
+    ) -> HandlerStatus:
         telegram_id = update["message"]["from"]["id"]
 
         storage.clear_user_state_and_order(telegram_id)

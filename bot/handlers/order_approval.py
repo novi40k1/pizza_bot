@@ -1,11 +1,17 @@
-
 from bot.domain.messenger import Messenger
 from bot.domain.storage import Storage
 from bot.handlers.handler import Handler, HandlerStatus
 
 
 class OrderApprovalHandler(Handler):
-    def can_handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> bool:
+    def can_handle(
+        self,
+        update: dict,
+        state: str,
+        data: dict,
+        storage: Storage,
+        messenger: Messenger,
+    ) -> bool:
         if "callback_query" not in update:
             return False
 
@@ -15,7 +21,14 @@ class OrderApprovalHandler(Handler):
         callback_data = update["callback_query"]["data"]
         return callback_data in ["order_confirm", "order_cancel"]
 
-    def handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> HandlerStatus:
+    def handle(
+        self,
+        update: dict,
+        state: str,
+        data: dict,
+        storage: Storage,
+        messenger: Messenger,
+    ) -> HandlerStatus:
         telegram_id = update["callback_query"]["from"]["id"]
         callback_data = update["callback_query"]["data"]
 

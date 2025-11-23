@@ -6,6 +6,7 @@ from bot.domain.messenger import Messenger
 
 load_dotenv()
 
+
 class MessengerTelegram(Messenger):
     def make_request(self, method: str, **param) -> dict:
         json_data = json.dumps(param).encode("utf-8")
@@ -21,24 +22,21 @@ class MessengerTelegram(Messenger):
             assert response_json["ok"] is True
             return response_json["result"]
 
-
     def getUpdates(self, **params) -> dict:
         return self.make_request("getUpdates", **params)
 
-
-    def sendMessage(self,chat_id: int, text: str, **params) -> dict:
+    def sendMessage(self, chat_id: int, text: str, **params) -> dict:
         return self.make_request("sendMessage", chat_id=chat_id, text=text, **params)
-
 
     def getMe(self) -> dict:
         return self.make_request("getMe")
 
+    def deleteMessage(self, chat_id: int, message_id: int) -> dict:
+        return self.make_request(
+            "deleteMessage", chat_id=chat_id, message_id=message_id
+        )
 
-    def deleteMessage(self,chat_id: int, message_id: int) -> dict:
-        return self.make_request("deleteMessage", chat_id=chat_id, message_id=message_id)
-
-
-    def answerCallbackQuery(self,callback_query_id: str, **params) -> dict:
+    def answerCallbackQuery(self, callback_query_id: str, **params) -> dict:
         return self.make_request(
             "answerCallbackQuery", callback_query_id=callback_query_id, **params
         )

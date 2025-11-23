@@ -3,7 +3,7 @@ from bot.dispatcher import Dispatcher
 from bot.domain.messenger import Messenger
 
 
-def start_long_polling(dispatcher: Dispatcher, messenger : Messenger) -> None:
+def start_long_polling(dispatcher: Dispatcher, messenger: Messenger) -> None:
     next_update_offset = 0
     while True:
         updates = messenger.getUpdates(offset=next_update_offset)

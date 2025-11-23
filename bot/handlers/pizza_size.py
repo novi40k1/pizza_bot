@@ -7,7 +7,14 @@ from bot.handlers.handler import Handler, HandlerStatus
 
 
 class PizzaSizeHandler(Handler):
-    def can_handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> bool:
+    def can_handle(
+        self,
+        update: dict,
+        state: str,
+        data: dict,
+        storage: Storage,
+        messenger: Messenger,
+    ) -> bool:
         if "callback_query" not in update:
             return False
 
@@ -17,7 +24,14 @@ class PizzaSizeHandler(Handler):
         callback_data = update["callback_query"]["data"]
         return callback_data.startswith("size_")
 
-    def handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> HandlerStatus:
+    def handle(
+        self,
+        update: dict,
+        state: str,
+        data: dict,
+        storage: Storage,
+        messenger: Messenger,
+    ) -> HandlerStatus:
         telegram_id = update["callback_query"]["from"]["id"]
         callback_data = update["callback_query"]["data"]
 

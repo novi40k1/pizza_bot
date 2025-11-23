@@ -9,14 +9,13 @@ load_dotenv()
 
 
 class StorageSqlite(Storage):
-    def persist_update(self,update: dict) -> None:
+    def persist_update(self, update: dict) -> None:
         payload = json.dumps(update, ensure_ascii=False, indent=2)
         with sqlite3.connect(os.getenv("SQLITE_DATABASE_PATH")) as connection:
             with connection:
                 connection.execute(
                     "INSERT INTO telegram_events (payload) VALUES (?)", (payload,)
                 )
-
 
     def recreate_database(self) -> None:
         with sqlite3.connect(os.getenv("SQLITE_DATABASE_PATH")) as connection:
@@ -45,8 +44,7 @@ class StorageSqlite(Storage):
                     """,
                 )
 
-
-    def ensure_user_exists(self,telegram_id: int) -> None:
+    def ensure_user_exists(self, telegram_id: int) -> None:
         """Ensure a user with the given telegram_id exists in the users table.
         If the user doesn't exist, create them. All operations happen in a single transaction.
         """
@@ -63,8 +61,7 @@ class StorageSqlite(Storage):
                         "INSERT INTO users (telegram_id) VALUES (?)", (telegram_id,)
                     )
 
-
-    def get_user(self,telegram_id: int) -> dict:
+    def get_user(self, telegram_id: int) -> dict:
         """Get complete user object from the users table by telegram_id.
         Returns a dict with all user fields (id, telegram_id, created_at, state, order_json), or None if user doesn't exist.
         """
@@ -85,17 +82,16 @@ class StorageSqlite(Storage):
                     }
                 return None
 
-
-    def update_user_state(self,telegram_id: int, state: str) -> None:
+    def update_user_state(self, telegram_id: int, state: str) -> None:
         """Update user state in the users table."""
         with sqlite3.connect(os.getenv("SQLITE_DATABASE_PATH")) as connection:
             with connection:
                 connection.execute(
-                    "UPDATE users SET state = ? WHERE telegram_id = ?", (state, telegram_id)
+                    "UPDATE users SET state = ? WHERE telegram_id = ?",
+                    (state, telegram_id),
                 )
 
-
-    def update_user_order_json(self,telegram_id: int, order_json: dict) -> None:
+    def update_user_order_json(self, telegram_id: int, order_json: dict) -> None:
         """Update user order_json with a JSON object in the users table."""
         with sqlite3.connect(os.getenv("SQLITE_DATABASE_PATH")) as connection:
             with connection:
@@ -104,8 +100,7 @@ class StorageSqlite(Storage):
                     (json.dumps(order_json, ensure_ascii=False, indent=2), telegram_id),
                 )
 
-
-    def clear_user_state_and_order(self,telegram_id: int) -> None:
+    def clear_user_state_and_order(self, telegram_id: int) -> None:
         """Clear user state and order_json in the users table."""
         with sqlite3.connect(os.getenv("SQLITE_DATABASE_PATH")) as connection:
             with connection:

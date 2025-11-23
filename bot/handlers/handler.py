@@ -4,6 +4,7 @@ from enum import Enum
 from bot.domain.messenger import Messenger
 from bot.domain.storage import Storage
 
+
 class HandlerStatus(Enum):
     CONTINUE = 1
     STOP = 2
@@ -11,9 +12,23 @@ class HandlerStatus(Enum):
 
 class Handler(ABC):
     @abstractmethod
-    def can_handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> bool:
+    def can_handle(
+        self,
+        update: dict,
+        state: str,
+        data: dict,
+        storage: Storage,
+        messenger: Messenger,
+    ) -> bool:
         pass
 
     @abstractmethod
-    def handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> bool:
+    def handle(
+        self,
+        update: dict,
+        state: str,
+        data: dict,
+        storage: Storage,
+        messenger: Messenger,
+    ) -> bool:
         pass
