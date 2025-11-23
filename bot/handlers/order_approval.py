@@ -1,4 +1,3 @@
-import json
 
 import bot.telegram_client
 import bot.database_client
