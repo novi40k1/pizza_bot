@@ -1,12 +1,12 @@
 import json
 
-import bot.telegram_client
-import bot.database_client
+from bot.domain.messenger import Messenger
+from bot.domain.storage import Storage
 from bot.handlers.handler import Handler, HandlerStatus
 
 
 class PizzaDrinksHandler(Handler):
-    def can_handle(self, update: dict, state: str, data: dict) -> bool:
+    def can_handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> bool:
         if "callback_query" not in update:
             return False
 
@@ -16,7 +16,7 @@ class PizzaDrinksHandler(Handler):
         callback_data = update["callback_query"]["data"]
         return callback_data.startswith("drink_")
 
-    def handle(self, update: dict, state: str, data: dict) -> HandlerStatus:
+    def handle(self, update: dict, state: str, data: dict,storage : Storage, messenger: Messenger) -> HandlerStatus:
         telegram_id = update["callback_query"]["from"]["id"]
         callback_data = update["callback_query"]["data"]
 
@@ -32,11 +32,11 @@ class PizzaDrinksHandler(Handler):
 
         drink = drink_mapping.get(callback_data)
         data["drink"] = drink
-        bot.database_client.update_user_order_json(telegram_id, data)
-        bot.database_client.update_user_state(telegram_id, "WAIT_FOR_ORDER_APPROVE")
+        storage.update_user_order_json(telegram_id, data)
+        storage.update_user_state(telegram_id, "WAIT_FOR_ORDER_APPROVE")
 
-        bot.telegram_client.answerCallbackQuery(update["callback_query"]["id"])
-        bot.telegram_client.deleteMessage(
+        messenger.answerCallbackQuery(update["callback_query"]["id"])
+        messenger.deleteMessage(
             chat_id=update["callback_query"]["message"]["chat"]["id"],
             message_id=update["callback_query"]["message"]["message_id"],
         )
@@ -50,7 +50,7 @@ class PizzaDrinksHandler(Handler):
 Please confirm your order:
         """
 
-        bot.telegram_client.sendMessage(
+        messenger.sendMessage(
             chat_id=update["callback_query"]["message"]["chat"]["id"],
             text=order_summary,
             reply_markup=json.dumps(
