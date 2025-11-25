@@ -12,7 +12,7 @@ class MessengerTelegram(Messenger):
         json_data = json.dumps(param).encode("utf-8")
         request = urllib.request.Request(
             method="POST",
-            url=f"{os.getenv("TELEGRAM_BASE_URI")}/{method}",
+            url=f"{os.getenv('TELEGRAM_BASE_URI')}/{method}",
             data=json_data,
             headers={"Content-Type": "application/json"},
         )
