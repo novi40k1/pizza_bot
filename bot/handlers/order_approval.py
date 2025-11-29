@@ -1,6 +1,7 @@
 from bot.domain.messenger import Messenger
 from bot.domain.storage import Storage
 from bot.handlers.handler import Handler, HandlerStatus
+import asyncio
 
 
 class OrderApprovalHandler(Handler):
@@ -21,7 +22,7 @@ class OrderApprovalHandler(Handler):
         callback_data = update["callback_query"]["data"]
         return callback_data in ["order_confirm", "order_cancel"]
 
-    def handle(
+    async def handle(
         self,
         update: dict,
         state: str,
@@ -32,14 +33,16 @@ class OrderApprovalHandler(Handler):
         telegram_id = update["callback_query"]["from"]["id"]
         callback_data = update["callback_query"]["data"]
 
-        messenger.answerCallbackQuery(update["callback_query"]["id"])
-        messenger.deleteMessage(
-            chat_id=update["callback_query"]["message"]["chat"]["id"],
-            message_id=update["callback_query"]["message"]["message_id"],
+        await asyncio.gather(
+            messenger.answerCallbackQuery(update["callback_query"]["id"]),
+            messenger.deleteMessage(
+                chat_id=update["callback_query"]["message"]["chat"]["id"],
+                message_id=update["callback_query"]["message"]["message_id"],
+            ),
         )
 
         if callback_data == "order_confirm":
-            storage.update_user_state(telegram_id, "ORDER_FINISHED")
+            await storage.update_user_state(telegram_id, "ORDER_FINISHED")
 
             order_summary = f"""
 🎉 Order confirmed!
@@ -53,13 +56,13 @@ Thank you for your order!
 Your order will be ready in 30 minutes!
             """
 
-            messenger.sendMessage(
+            await messenger.sendMessage(
                 chat_id=update["callback_query"]["message"]["chat"]["id"],
                 text=order_summary,
             )
         else:
-            storage.clear_user_state_and_order(telegram_id)
-            messenger.sendMessage(
+            await storage.clear_user_state_and_order(telegram_id)
+            await messenger.sendMessage(
                 chat_id=update["callback_query"]["message"]["chat"]["id"],
                 text="❌ Order canceled. To start over, send /start",
             )

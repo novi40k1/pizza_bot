@@ -2,9 +2,11 @@ from bot.dispatcher import Dispatcher
 from bot.handlers.pizza_selection import PizzaSelectionHandler
 
 from tests.mock import Mock
+import pytest
 
 
-def test_pizza_selection_handler():
+@pytest.mark.asyncio
+async def test_pizza_selection_handler():
     test_update = {
         "update_id": 123456789,
         "callback_query": {
@@ -35,32 +37,32 @@ def test_pizza_selection_handler():
     delete_message_called = False
     send_message_called = False
 
-    def update_user_order_json(telegram_id: int, order_data: dict) -> None:
+    async def update_user_order_json(telegram_id: int, order_data: dict) -> None:
         assert telegram_id == 12345
         assert order_data == {"pizza_name": "Margherita"}
         nonlocal update_user_order_json_called
         update_user_order_json_called = True
 
-    def update_user_state(telegram_id: int, state: str) -> None:
+    async def update_user_state(telegram_id: int, state: str) -> None:
         assert telegram_id == 12345
         assert state == "WAIT_FOR_PIZZA_SIZE"
         nonlocal update_user_state_called
         update_user_state_called = True
 
-    def answerCallbackQuery(callback_query_id: str) -> dict:
+    async def answerCallbackQuery(callback_query_id: str) -> dict:
         assert callback_query_id == "test_callback_id"
         nonlocal answer_callback_query_called
         answer_callback_query_called = True
         return {"ok": True}
 
-    def deleteMessage(chat_id: int, message_id: int) -> dict:
+    async def deleteMessage(chat_id: int, message_id: int) -> dict:
         assert chat_id == 12345
         assert message_id == 100
         nonlocal delete_message_called
         delete_message_called = True
         return {"ok": True}
 
-    def sendMessage(chat_id: int, text: str, **kwargs) -> dict:
+    async def sendMessage(chat_id: int, text: str, **kwargs) -> dict:
         assert chat_id == 12345
         assert text == "Please select pizza size"
         assert "reply_markup" in kwargs
@@ -68,7 +70,7 @@ def test_pizza_selection_handler():
         send_message_called = True
         return {"ok": True}
 
-    def get_user(telegram_id: int) -> dict:
+    async def get_user(telegram_id: int) -> dict:
         assert telegram_id == 12345
         return {
             "id": 1,
@@ -95,7 +97,7 @@ def test_pizza_selection_handler():
 
     dispatcher = Dispatcher(mock_storage, mock_messenger)
     dispatcher.add_handlers(PizzaSelectionHandler())
-    dispatcher.dispatch(test_update)
+    await dispatcher.dispatch(test_update)
 
     # Verify all expected methods were called
     assert update_user_order_json_called

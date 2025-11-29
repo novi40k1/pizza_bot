@@ -1,5 +1,5 @@
 import json
-
+import asyncio
 from bot.domain.messenger import Messenger
 from bot.domain.storage import Storage
 from bot.handlers.handler import Handler, HandlerStatus
@@ -20,7 +20,7 @@ class StartOverHandler(Handler):
         callback_data = update["callback_query"]["data"]
         return callback_data == "start_over"
 
-    def handle(
+    async def handle(
         self,
         update: dict,
         state: str,
@@ -29,16 +29,16 @@ class StartOverHandler(Handler):
         messenger: Messenger,
     ) -> HandlerStatus:
         telegram_id = update["callback_query"]["from"]["id"]
-
-        storage.clear_user_state_and_order(telegram_id)
-        storage.update_user_state(telegram_id, "WAIT_FOR_PIZZA_NAME")
-
-        messenger.answerCallbackQuery(update["callback_query"]["id"])
-        messenger.deleteMessage(
-            chat_id=update["callback_query"]["message"]["chat"]["id"],
-            message_id=update["callback_query"]["message"]["message_id"],
+        await asyncio.gather(
+            storage.clear_user_state_and_order(telegram_id),
+            storage.update_user_state(telegram_id, "WAIT_FOR_PIZZA_NAME"),
+            messenger.answerCallbackQuery(update["callback_query"]["id"]),
+            messenger.deleteMessage(
+                chat_id=update["callback_query"]["message"]["chat"]["id"],
+                message_id=update["callback_query"]["message"]["message_id"],
+            ),
         )
-        messenger.sendMessage(
+        await messenger.sendMessage(
             chat_id=update["callback_query"]["message"]["chat"]["id"],
             text="🔄 Starting over... Please choose pizza name",
             reply_markup=json.dumps(
